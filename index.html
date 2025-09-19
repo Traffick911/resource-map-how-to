@@ -1,386 +1,178 @@
-<html>
-<head>
-	<meta https-equiv="Content-type" content="text/html;charset=UTF-8"/>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
-	<meta name="apple-mobile-web-app-capable" content="no" />
-	<meta name="apple-mobile-web-app-status-bar-style" content="black" />
-    <title>WEBSITE TITLE</title>
-
-	<meta property="og:image" content="images/icon_300.png"/>
-	<link rel="apple-touch-icon" href="images/icon_300.png"/>
-
-	<link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
-	<script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
-	<script>
-    	$(document).on("mobileinit", function () {
-        	$.mobile.hashListeningEnabled = false;
-        	$.mobile.pushStateEnabled = false;
-    	});
-	</script>
-	<script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-	<style>
-		.content {
-			text-align:left;
-			max-width:700px;
-			margin:0 auto 0 auto;
-			padding:0 15px 25px 15px
-		}
-	</style>
-</head>
-<body>
-
-<div data-role="page" id="filter">
-	<div data-role="header" data-position="fixed">
-		<h1>TITLE</h1>
-		<a href="#about" class="ui-btn ui-icon-info ui-btn-icon-notext ui-corner-all ui-btn-right" data-transition="slide"></a>
-	</div>
-	<div data-role="content" class="content">
-		<div class="ui-field-contain"> DESCRIPTION
-			<select id="town" name="select-native-1" id="select-native-1" style="width:100%" onChange="list_page();">
-        		<option value="0">Choose a Location</option>
-						<option id="loading_selection" value="0">Loading Locations...</option>
-						<option v-for="item in items" v-bind:value="item['fields']['Latitude, Longitude, Zoom']">{{ item['fields']['Name'] }}</option>
-    		</select>
-		</div>
-
-		<p> AGE </p>
-		<input name="age" id="age" data-type="number" placeholder="Input Age" onChange="list_page();">
-
-		<fieldset id="categories" data-role="controlgroup">
-			<p style="margin-top:15px;">Check the type(s) of service(s) you are looking for:</p>
-		</fieldset>
-
-		<fieldset data-role="controlgroup" data-type="horizontal">
-    		<input type="radio" name="radio-choice-h-2" id="radio-choice-h-2a" value="list" checked="checked">
-    		<label for="radio-choice-h-2a">List View</label>
-    		<input type="radio" name="radio-choice-h-2" id="radio-choice-h-2b" value="map">
-    		<label for="radio-choice-h-2b">Map View</label>
-		</fieldset>
-
-		<a href="javascript:results_page();" data-role="button">Find Resources</a>
-
-	</div>
-</div>
-
-
-
-<div data-role="page" id="about">
-	<div data-role="header" data-position="fixed">
-		<h1>About</h1>
-		<a href="#" data-rel="back" data-transition="slide" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-arrow-l ui-btn-icon-notext"></a>
-	</div>
-	<div data-role="content" class="content">
-		<p> ABOUT PAGE CONTENT
-	</div>
-</div>
-
-
-
-<div data-role="page" id="details">
-	<div data-role="header" data-position="fixed">
-		<h1>Details</h1>
-		<a href="#" data-rel="back" data-transition="slide" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-arrow-l ui-btn-icon-notext"></a>
-	</div>
-	<div data-role="content" class="content">
-		<div id="detail" v-for="" v-if="">
-		</div>
-	</div>
-</div>
-
-
-
-<div data-role="page" id="results">
-	<div data-role="header" data-position="fixed">
-		<h1>Results</h1>
-		<a href="#filter" data-transition="slide" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home ui-btn-icon-notext"></a>
-		<div data-role="navbar">
-			<ul>
-				<li><a href="#results">List</a></li>
-				<li><a href="javascript:void('');" style="color:#ccc" onClick="size_map();$.mobile.changePage($('#map-page'), { transition: 'none'});">Map</a></li>
-			</ul>
-		</div>
-	</div>
-		<div data-role="content" class="content">
-				<h1 id="town_name"></h1>
-				<ul id="org_list" data-role="listview" data-inset="true">
-				</ul>
-		</div>
-
-		<ul id="org_geo_list" style="display:none;"></ul>
-
-</div>
-
-
-
-<div data-role="page" id="map-page" style="background:#798e9e;">
-	<div data-role="header" data-position="fixed">
-		<h1>Results</h1>
-		<a href="#filter" data-transition="slide" data-direction="reverse" class="ui-btn ui-shadow ui-corner-all ui-btn-icon-left ui-icon-home ui-btn-icon-notext"></a>
-		<div data-role="navbar">
-			<ul>
-				<li><a href="#results" data-transition="none" style="color:#ccc">List</a></li>
-				<li><a href="#map-page">Map</a></li>
-			</ul>
-		</div>
-	</div>
-		<div>
-			<div id="map" style="width:100%;height:100px;"></div>
-		</div>
-</div>
-
-<!-- Include Dependency Scripts -->
-<!--<script type="text/javascript" src="https://unpkg.com/vue"></script>-->
-<script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.16.2/axios.min.js"></script>
-
-<script async defer src="https://maps.googleapis.com/maps/api/js?key= "></script>
-
-<script type="text/javascript">
-
-	var app_id = "app ";
-	var app_key = "key ";
-	var cat_names = [["Outreach","Community Outreach"],["Counseling","Counseling"],["Training","Job Opportunities/Training"],["Health","Health Services"],["Risk","High Risk"],["Multi","Multi-Service"]];
-
-	var categories = "";
-	var ages = "";
-	var work = 0;
-
-	function load_first() {
-			cat_names.forEach((cat, index) => {
-					$("#categories").html( $("#categories").html() + "<input type=\"checkbox\" name=\"checkbox-v-"+cat[0]+"\" id=\"checkbox-v-"+cat[0]+"\" onChange=\"list_page();\" checked=\"checked\">");
-					$("#categories").html( $("#categories").html() + "<label for=\"checkbox-v-"+cat[0]+"\">"+cat[1]+"</label>");
-			});
-			$( '#categories' ).enhanceWithin();
-			load_api_data('#filter',0);
-	}
-
-	load_first();
-
-	function load_api_data(target,mode=3,id='') {
-		work = 1;
-		if (mode == 0) {
-			apicall = "https://api.airtable.com/v0/"+app_id+"/Locations/?sort[0][field]=Name&sort[0][direction]=asc";
-		} else if (mode == 1) {
-			apicall = "https://api.airtable.com/v0/"+app_id+"/Categories/?sort[0][field]=Name&sort[0][direction]=asc";
-		} else if (mode == 2) {
-			apicall = "https://api.airtable.com/v0/"+app_id+"/" + $('#town').find(":selected").text() + "/?filterByFormula=AND("+ages+"OR("+categories+"))&sort[0][field]=Name&sort[0][direction]=asc";
-		} else if (mode == 3) {
-			apicall = "https://api.airtable.com/v0/"+app_id+"/" + $('#town').find(":selected").text() + "/?filterByFormula=(RECORD_ID()=\""+id+"\")";
-		}
-
-		var app = new Vue({
-              el: target,
-              data: {
-                  items: []
-              },
-              mounted: function(){
-                 this.loadItems();
-              },
-              methods: {
-                  loadItems: function(){
-
-                      // Init variables
-                      var self = this
-                      this.items = []
-					axios.get(
-													 apicall,
-                          {
-                              headers: { Authorization: "Bearer "+ app_key }
-                          }
-                      ).then(function(response){
-                          self.items = response.data.records;
-													work = 0;
-													if (mode == 0) {	$('#loading_selection').remove() }
-                      }).catch(function(error){
-                          console.log(error)
-                      })
-                  }
-              }
-          });
-	}
-
-	function results_page() {
-
-		if ($('#town').find(":selected").val() == 0) {
-			alert('You must choose a location.');
-		} else if ( isNaN(Number($('#age').val())) ) {
-			alert('You must enter a numeric age (in years) or leave blank.')
-		} else if ($('#checkbox-v- ').is(":checked") || $('#checkbox-v- ').is(":checked") || $('#checkbox-v- ').is(":checked") || $('#checkbox-v- ').is(":checked") || $('#checkbox-v- ').is(":checked") || $('#checkbox-v- ').is(":checked")) {
-			next_page_1()
-    } else {
-			alert('You must choose at least one type of service.')
-		}
-	}
-
-	function next_page_1() {
-		if (work == 0) {
-			if ($('input[name=radio-choice-h-2]:checked', '#filter').val() == "map") {
-					size_map();
-					$.mobile.changePage($('#map-page'), { transition: 'slide'});
-			} else {
-					$.mobile.changePage($('#results'), { transition: 'slide'});
-			}
-		} else {
-			if ($.mobile.loading().is(':hidden')) {
-				$.mobile.loading("show");
-			}
-			setTimeout(function () {
-        next_page_1()
-    	}, 100);
-		}
-	}
-
-	function list_page() {
-
-		if ($('#town').find(":selected").val() != 0 && !isNaN(Number($('#age').val())) ) {
-				$("#org_list").html("");
-				$("#org_geo_list").html("<li id=\"ge0_points\" v-for=\"item in items\">{{ item['id'] }},{{ item['fields']['Name'] }},{{ item['fields']['Latitude'] }},{{ item['fields']['Longitude'] }}</li>");
-
-				categories = "";
-
-				cat_names.forEach((cat, index) => {
-					if ($('#checkbox-v-'+cat[0]).is(":checked")){
-						$("#org_list").html( $("#org_list").html() + "<li data-role=\"list-divider\">"+cat[1]+"</li>")
-						$("#org_list").html( $("#org_list").html() + "<li v-for=\"item in items\" v-if=\"item['fields']['Category'] == '"+cat[1]+"'\"><a href=\"javascript:void('')\" v-bind:id=\"item['id']\" onClick=\"details_page(this.id);\">{{ item['fields']['Name'] }}<p>Ages: {{ item['fields']['Minimum Age'] }}-{{ item['fields']['Maximum Age'] }}; Gender(s): {{ item['fields']['Gender'] }}</p></a></li>")
-						if (categories != "") {
-							categories = categories+",";
-						}
-						categories = categories+"FIND(\""+cat[1]+"\",{Category})";
-					}
-				});
-
-				if ($('#age').val()=="") {
-					ages = "";
-				} else {
-					ages = Number($('#age').val())+"<={Maximum Age},"+Number($('#age').val())+">={Minimum Age},";
-				}
-
-				$('#town_name').html($('#town').find(":selected").text());
-
-		    load_api_data('#results',2);
-
-				geo_data = $('#town').find(":selected").val().split(',').map(Number);
-				//console.log(geo_data)
-
-				lat = geo_data[0];
-				lon = geo_data[1];
-				zoomin = geo_data[2];
-
-	  	} else {
-				return false;
-			}
-
-		}
-
-		function details_page(id) {
-
-      	$("#detail").attr("v-for", "item in items");
-      	//$("#detail").attr("v-if", "item['id'] == '"+id+"'");
-      	$("#detail").html("");
-      	$("#detail").html($("#detail").html() + "<h3>{{ item['fields']['Name'] }}</h3>")
-      	$("#detail").html($("#detail").html() + "<h4>{{ item['fields']['Category'] }}</h4>");
-      	$("#detail").html($("#detail").html() + "<p><b>Ages:</b> {{ item['fields']['Minimum Age'] }}-{{ item['fields']['Maximum Age'] }} &nbsp;&nbsp; <b>Gender(s):</b> {{ item['fields']['Gender'] }}</p>");
-		$("#detail").html($("#detail").html() + "<p><b>Phone:</b> <a v-bind:href=\"'tel:'+item['fields']['Phone']\" target=\"_blank\">{{ item['fields']['Phone'] }}</p>");
-		$("#detail").html($("#detail").html() + "<p><b>Email:</b> <a v-bind:href=\"'mailto:'+item['fields']['Email']\" target=\"_blank\">{{ item['fields']['Email'] }}</a></p>");
-      	$("#detail").html($("#detail").html() + "<p><b>Website:</b> <a v-bind:href=\"item['fields']['Website']\" target=\"_blank\">{{ item['fields']['Website'] }}</a></p>");
-      	$("#detail").html($("#detail").html() + "<p><b>Address:</b> <a v-bind:href=\"'https://www.google.com/maps/place/'+item['fields']['Address']\" target=\"_blank\">{{ item['fields']['Address'] }}</a></p>");
-      	$("#detail").html($("#detail").html() + "<p><b>Description:</b> {{ item['fields']['Description'] }}</p>");
-				$("#detail").html($("#detail").html() + "<p><b>Valid As Of:</b> {{ item['fields']['Valid As Of'] }}</p>");
-
-			load_api_data('#details',3,id);
-
-
-			//$.mobile.changePage($('#details'), { transition: 'slide'})
-			next_page_2();
-
-      //$('#details').listview('refresh');
-		  //$( '#details' ).enhanceWithin();
-      //$.mobile.changePage($('#details'), { transition: 'slide'});
-      //return true;
-    }
-
-		function next_page_2() {
-			if (work == 0) {
-				$.mobile.changePage($('#details'), { transition: 'slide'})
-			} else {
-				if ($.mobile.loading().is(':hidden')) {
-					$.mobile.loading("show");
-				}
-				setTimeout(function () {
-					next_page_2()
-				}, 100);
-			}
-		}
-
-		//list_page();
-
-		/*
-		https://developers.google.com/maps/documentation/javascript/adding-a-google-map
-			*/
-
-		var markers = [];
-
-		function initMap(lat,lon,zoomin) {
-			var uluru = {lat: lat, lng: lon};
-			var map = new google.maps.Map(document.getElementById('map'), {
-		        zoom: zoomin,
-		        center: uluru
-		      });
-
-			i = 0;
-			$('#org_geo_list li').each(function(){
-				//alert($(this).text());
-				pin_data = $(this).text().split(',');
-				marker = new google.maps.Marker({
-					position: {lat: Number(pin_data[2]), lng: Number(pin_data[3])},
-					map: map
-				});
-				var infowindow = new google.maps.InfoWindow({
-					content: "<div style=\"width:225px;text-align:center;\"><h2>"+pin_data[1]+"</h2><div style=\"width:100%;text-align:center;padding-bottom:10px;\"><a href=\"javascript:details_page(\'"+pin_data[0]+"\')\">view details</a></span></div>"
-				});
-
-				//creates an infowindow 'key' in the marker.
-				marker.infowindow = infowindow;
-
-				//finally call the explicit infowindow object
-				marker.addListener('click', function() {
-					hideAllInfoWindows(map);
-					return this.infowindow.open(map, this);
-				});
-
-				markers.push(marker);
-
-				++i;
-			});
-
-			google.maps.event.addListener(map, 'click', function() {
-			    if (infowindow) {
-			        infowindow.close();
-			    }
-			});
-
-		}
-
-		function hideAllInfoWindows(map) {
-		   markers.forEach(function(marker) {
-		     marker.infowindow.close(map, marker);
-		  });
-		}
-
-		function size_map() {
-			initMap(lat,lon,zoomin);
-			$('#map').height( window.innerHeight - 81 +  'px');
-
-		}
-
-		$("div[data-role=page]").bind("pagebeforeshow", function (e, data) {
-		  $.mobile.silentScroll(0);
-		  $.mobile.changePage.defaults.transition = 'slide'; // reset default here
-		})
-
-</script>
-
-
-
-</body>
-</html>
+# === EMPLOYEES ===
+people = ["Jacie", "Gabby", "Tia", "Gaby", "Lynita", "Ashley", "Graciela", "Madison", "Paige", "Daniella”, “Alec”, “Brielle”, “Stephanie”]
+
+# === DATE RANGE ===
+start_date = datetime(2025, 10, 1)
+end_date = datetime(2025, 12, 19)
+dates = pd.date_range(start=start_date, end=end_date, freq='D').to_list()
+
+# === VACATION TEMPLATE ===
+vacations = {
+    "Jacie": [datetime(2025, 10, 3] + timedelta(days=i) for i in range(10)],
+    "Gabby": [datetime (2025, 10, 22] + timedelta(days=i) for i in range(7)],
+    "Tia": [datetime (2025, 10, 14] + timedelta(days=i) for i in range(7)],
+    "Gaby": [datetime (2025, 11, 29] + timedelta(days=i) for i in range(9)],
+    "Lynita": [datetime (2025, 11, 29] + timedelta(days=i) for i in range(9)],
+    "Ashley": [datetime (2025, 10, 25) + timedelta(days=i) for i in range(9)],
+    "Graciela": [datetime (2025, 11, 12] + timedelta(days=i) for i in range(7), + date time (2025, 12, 26],
+    "Madison": [datetime (2025, 10, 22] + timedelta(days=i) for i in range(7)],
+    "Paige": [datetime (2025, 11, 5) + timedelta(days=i) for i in range(8), 
+    "Daniella": [datetime (2025, 10, 31) + timedelta(days=i) for i in range(7), + datetime (2025, 10, 6],
+    “Alec”: [datetime (2025, 11, 7) + timedelta(days=i) for i in range(10)],
+    “Brielle”: [datetime (2025, 10, 4) + timedelta(days=i) for i in range(9)],
+    “Stephanie”: 
+}
+
+# === FIXED ASSIGNMENTS (Date -> (Primary, Backup)) ===
+fixed_assignments = {
+    datetime(2025, 11, 27): ("Brielle", "Gabby"),
+    datetime(2025, 11, 28) + timedelta(days=i) for i in range (3): ("Lynita", "Stephanie")
+}
+
+# === TRACKERS ===
+primary_count = defaultdict(int)
+backup_count = defaultdict(int)
+weekend_count = defaultdict(int)
+last_primary = {}
+last_backup = {}
+last_role = {}
+
+def get_month_key(date):
+    return f"{date.year}-{date.month:02d}"
+
+monthly_primary = defaultdict(lambda: defaultdict(int))
+monthly_backup = defaultdict(lambda: defaultdict(int))
+
+# === AVAILABILITY CHECK ===
+def is_available(person, date, last_assigned, last_role_check):
+    if person in vacations and date in vacations[person]:
+        return False
+    if last_assigned.get(person) and (date - last_assigned[person]).days == 1:
+        return False
+    if last_role_check.get(person) and (date - last_role_check[person][1]).days == 1:
+        return False
+    return True
+
+# === SCHEDULING FUNCTION ===
+def assign_on_call(dates, people):
+    schedule = []
+    i = 0
+    while i < len(dates):
+        date = dates[i]
+        day_name = date.strftime("%A")
+        is_weekend = day_name in ["Friday", "Saturday", "Sunday"]
+
+        # === HANDLE FIXED ASSIGNMENTS FIRST (override availability) ===
+        if date in fixed_assignments:
+            p1, p2 = fixed_assignments[date]
+            schedule.append({"Date": date, "Primary": p1, "Backup": p2})
+            last_primary[p1] = date
+            last_backup[p2] = date
+            last_role[p1] = ("primary", date)
+            last_role[p2] = ("backup", date)
+            monthly_primary[get_month_key(date)][p1] += 1
+            monthly_backup[get_month_key(date)][p2] += 1
+            if is_weekend:
+                weekend_count[p1] += 1
+                weekend_count[p2] += 1
+            i += 1
+            continue
+
+        weekend_block = False
+        if day_name == "Friday" and i + 2 < len(dates):
+            saturday = dates[i + 1]
+            sunday = dates[i + 2]
+            if saturday.strftime("%A") == "Saturday" and sunday.strftime("%A") == "Sunday":
+                weekend_block = True
+
+        def score(person, role):
+            month_key = get_month_key(date)
+            m_count = monthly_primary[month_key][person] if role == 'primary' else monthly_backup[month_key][person]
+            w_score = weekend_count[person]
+            return m_count + (2 if is_weekend else 0) + (3 if w_score > 1 else 0)
+
+        candidates = sorted(people, key=lambda p: (score(p, 'primary'), random.random()))
+        assigned = False
+
+        for p1 in candidates:
+            if not is_available(p1, date, last_primary, last_role):
+                continue
+            if monthly_primary[get_month_key(date)][p1] >= 3:
+                continue
+            for p2 in candidates:
+                if p2 == p1 or not is_available(p2, date, last_backup, last_role):
+                    continue
+                if monthly_backup[get_month_key(date)][p2] >= 3:
+                    continue
+                if is_weekend and weekend_count[p1] >= 2 and weekend_count[p2] >= 2:
+                    continue
+
+                # === HANDLE WEEKEND BLOCK (Fri–Sun) ===
+                if weekend_block:
+                    block_days = [date, saturday, sunday]
+                    if all(
+                        is_available(p1, d, last_primary, last_role) and
+                        is_available(p2, d, last_backup, last_role) and
+                        (p1 not in vacations or d not in vacations[p1]) and
+                        (p2 not in vacations or d not in vacations[p2])
+                        for d in block_days
+                    ) and all(
+                        monthly_primary[get_month_key(d)][p1] < 3 and
+                        monthly_backup[get_month_key(d)][p2] < 3
+                        for d in block_days
+                    ):
+                        for d in block_days:
+                            schedule.append({"Date": d, "Primary": p1, "Backup": p2})
+                            monthly_primary[get_month_key(d)][p1] += 1
+                            monthly_backup[get_month_key(d)][p2] += 1
+                        last_primary[p1] = sunday
+                        last_backup[p2] = sunday
+                        last_role[p1] = ("primary", sunday)
+                        last_role[p2] = ("backup", sunday)
+                        weekend_count[p1] += 1
+                        weekend_count[p2] += 1
+                        i += 3
+                        assigned = True
+                        break
+
+                else:
+                    # === NORMAL ASSIGNMENT ===
+                    schedule.append({"Date": date, "Primary": p1, "Backup": p2})
+                    last_primary[p1] = date
+                    last_backup[p2] = date
+                    last_role[p1] = ("primary", date)
+                    last_role[p2] = ("backup", date)
+                    monthly_primary[get_month_key(date)][p1] += 1
+                    monthly_backup[get_month_key(date)][p2] += 1
+                    if is_weekend:
+                        weekend_count[p1] += 1
+                        weekend_count[p2] += 1
+                    i += 1
+                    assigned = True
+                    break
+            if assigned:
+                break
+        if not assigned:
+            schedule.append({"Date": date, "Primary": "Unfilled", "Backup": "Unfilled"})
+            i += 1
+
+    return pd.DataFrame(schedule)
+
+# === RUN THE SCHEDULER ===
+on_call_schedule = assign_on_call(dates, people)
+on_call_schedule = on_call_schedule.sort_values("Date").reset_index(drop=True)
+
+# === FAIRNESS SUMMARY ===
+summary = pd.DataFrame({
+    "Person": people,
+    "Total Primary": [sum(monthly_primary[m][p] for m in monthly_primary) for p in people],
+    "Total Backup": [sum(monthly_backup[m][p] for m in monthly_backup) for p in people],
+    "Weekend Shifts": [weekend_count[p] for p in people]
+})
+
+# === EXPORT TO CSV ===
+on_call_schedule.to_csv("on_call_schedule.csv", index=False)
+summary.to_csv("fairness_summary.csv", index=False)
+
+# === PREVIEW ===
+on_call_schedule.head()
